@@ -25,10 +25,6 @@ cargo add kcipher2
 
 ### Crate features
 
-#### `std`
-
-Enables features that depend on the standard library.
-
 #### `zeroize`
 
 Enables the [`zeroize`] crate.

@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 Shun Sakai
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
+format_code_in_doc_comments = true
+format_macro_matchers = true
+group_imports = "StdExternalCrate"
+hex_literal_case = "Upper"
+imports_granularity = "Crate"
+newline_style = "Unix"
+wrap_comments = true
