@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2026 Shun Sakai
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
+name: REUSE Compliance Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "develop"
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  reuse:
+    name: REUSE
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: REUSE Compliance Check
+        uses: fsfe/reuse-action@v6.0.0
