@@ -32,7 +32,7 @@
 //! cipher.apply_keystream(&mut buf);
 //! assert_eq!(buf, ciphertext);
 //!
-//! let mut ciphertext = buf;
+//! let ciphertext = buf;
 //!
 //! // Decrypt ciphertext by applying keystream again.
 //! let mut cipher = KCipher2::new(&key.into(), &nonce.into());
