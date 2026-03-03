@@ -5,6 +5,9 @@
 //! The `kcipher2` crate is an implementation of the [KCipher-2] stream cipher
 //! as described in [RFC 7008].
 //!
+//! Cipher functionality is accessed using traits from re-exported [`cipher`]
+//! crate.
+//!
 //! # Examples
 //!
 //! ```
