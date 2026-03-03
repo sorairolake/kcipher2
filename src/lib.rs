@@ -5,6 +5,45 @@
 //! The `kcipher2` crate is an implementation of the [KCipher-2] stream cipher
 //! as described in [RFC 7008].
 //!
+//! # Examples
+//!
+//! ```
+//! use hex_literal::hex;
+//! use kcipher2::{
+//!     KCipher2,
+//!     cipher::{KeyIvInit, StreamCipher},
+//! };
+//!
+//! let key = [0x42; 16];
+//! let nonce = [0x24; 16];
+//! let plaintext = hex!("00010203 04050607 08090A0B 0C0D0E0F");
+//! let ciphertext = hex!("471694B5 EB93E4A6 EABA73DF A6F77057");
+//!
+//! // Key and IV must be references to the `Array` type. Here we use the `Into`
+//! // trait to convert arrays into it.
+//! let mut cipher = KCipher2::new(&key.into(), &nonce.into());
+//!
+//! let mut buf = plaintext;
+//!
+//! // Apply keystream (encrypt).
+//! cipher.apply_keystream(&mut buf);
+//! assert_eq!(buf, ciphertext);
+//!
+//! let mut ciphertext = buf;
+//!
+//! // Decrypt ciphertext by applying keystream again.
+//! let mut cipher = KCipher2::new(&key.into(), &nonce.into());
+//! cipher.apply_keystream(&mut buf);
+//! assert_eq!(buf, plaintext);
+//!
+//! // Stream ciphers can be used with streaming messages.
+//! let mut cipher = KCipher2::new(&key.into(), &nonce.into());
+//! for chunk in buf.chunks_mut(3) {
+//!     cipher.apply_keystream(chunk);
+//! }
+//! assert_eq!(buf, ciphertext);
+//! ```
+//!
 //! [KCipher-2]: https://en.wikipedia.org/wiki/KCipher-2
 //! [RFC 7008]: https://datatracker.ietf.org/doc/html/rfc7008
 
@@ -14,17 +53,10 @@
 // Lint levels of rustc.
 #![deny(missing_docs)]
 
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+mod consts;
+mod kcipher2;
+mod utils;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub use cipher;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use crate::kcipher2::{Iv, KCipher2, KCipher2Core, Key};

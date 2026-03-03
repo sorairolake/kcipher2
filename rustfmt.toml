@@ -8,4 +8,5 @@ group_imports = "StdExternalCrate"
 hex_literal_case = "Upper"
 imports_granularity = "Crate"
 newline_style = "Unix"
+short_array_element_width_threshold = 20
 wrap_comments = true
