@@ -56,8 +56,8 @@ impl KCipher2Core {
 
         next_b[..10].copy_from_slice(&self.b[1..]);
 
-        let temp1 = (self.a[0] << 8) ^ consts::AMUL0[usize::try_from(self.a[0] >> 24).unwrap()];
-        next_a[4] = temp1 ^ self.a[3];
+        next_a[4] =
+            (self.a[0] << 8) ^ consts::AMUL0[usize::try_from(self.a[0] >> 24).unwrap()] ^ self.a[3];
         if matches!(mode, Mode::Init) {
             next_a[4] ^= utils::nlf(self.b[0], self.r2, self.r1, self.a[4]);
         }
