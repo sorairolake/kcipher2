@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2026 Shun Sakai
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
+[package]
+name = "kcipher2"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85.0"
+description = "An implementation of the KCipher-2 stream cipher"
+documentation = "https://docs.rs/kcipher2"
+repository = "https://github.com/sorairolake/kcipher2"
+license = "Apache-2.0 OR MIT"
+keywords = ["crypto", "kcipher2", "stream-cipher", "trait"]
+categories = ["cryptography", "no-std"]
+include = ["/LICENSES", "/README.md", "/src"]
+
+[package.metadata.docs.rs]
+all-features = true
+
+[dependencies]
+cipher = { version = "0.5.1", features = ["stream-wrapper"] }
+
+[dev-dependencies]
+cipher = { version = "0.5.1", features = ["dev"] }
+hex-literal = "1.1.0"
+
+[features]
+zeroize = ["cipher/zeroize"]
+
+[lints.clippy]
+cargo = { level = "warn", priority = -1 }
+multiple_crate_versions = "allow"
+nursery = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+
+[lints.rust]
+rust_2018_idioms = { level = "warn", priority = -1 }
+unsafe_code = "forbid"

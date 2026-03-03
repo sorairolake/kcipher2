@@ -1,0 +1,181 @@
+# SPDX-FileCopyrightText: 2026 Shun Sakai
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "develop"
+      - "main"
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Check
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os-alias:
+          - ubuntu
+          - macos
+          - windows
+        toolchain-alias:
+          - msrv
+          - stable
+        include:
+          - os-alias: ubuntu
+            os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+          - os-alias: macos
+            os: macos-15
+            target: aarch64-apple-darwin
+          - os-alias: windows
+            os: windows-2025
+            target: x86_64-pc-windows-msvc
+          - toolchain-alias: msrv
+            toolchain: 1.85.0
+          - toolchain-alias: stable
+            toolchain: stable
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          targets: ${{ matrix.target }}
+      - name: Cache build artifacts
+        uses: Swatinem/rust-cache@v2.8.2
+        with:
+          key: ${{ matrix.target }}
+      - name: Check a package
+        run: cargo check --target ${{ matrix.target }}
+      - name: Check a package (all features)
+        run: cargo check --target ${{ matrix.target }} --all-features
+
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os-alias:
+          - ubuntu
+          - macos
+          - windows
+        toolchain-alias:
+          - msrv
+          - stable
+        include:
+          - os-alias: ubuntu
+            os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+          - os-alias: macos
+            os: macos-15
+            target: aarch64-apple-darwin
+          - os-alias: windows
+            os: windows-2025
+            target: x86_64-pc-windows-msvc
+          - toolchain-alias: msrv
+            toolchain: 1.85.0
+          - toolchain-alias: stable
+            toolchain: stable
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          targets: ${{ matrix.target }}
+      - name: Cache build artifacts
+        uses: Swatinem/rust-cache@v2.8.2
+        with:
+          key: ${{ matrix.target }}
+      - name: Run tests
+        run: cargo test --target ${{ matrix.target }}
+      - name: Run tests (all features)
+        run: cargo test --target ${{ matrix.target }} --all-features
+
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
+          components: rustfmt
+      - name: Cache build artifacts
+        uses: Swatinem/rust-cache@v2.8.2
+      - name: Run formatter in check mode
+        run: cargo fmt --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
+          components: clippy
+      - name: Cache build artifacts
+        uses: Swatinem/rust-cache@v2.8.2
+      - name: Run linter
+        run: cargo clippy -- -D warnings
+      - name: Run linter (all features)
+        run: cargo clippy --all-features -- -D warnings
+
+  doc:
+    name: Documentation
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
+      - name: Cache build artifacts
+        uses: Swatinem/rust-cache@v2.8.2
+      - name: Run linter
+        env:
+          RUSTDOCFLAGS: "--cfg docsrs -D warnings"
+        run: cargo doc --no-deps --document-private-items --all-features
+
+  benchmark:
+    name: Benchmark
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
+      - name: Cache build artifacts
+        uses: Swatinem/rust-cache@v2.8.2
+      - name: Run benchmarks
+        run: cargo bench --all-features
+
+  prettier:
+    name: Prettier
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Run formatter in check mode
+        run: npx prettier -c "**.{md,yaml,yml}"
