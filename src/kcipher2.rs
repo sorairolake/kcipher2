@@ -19,16 +19,24 @@ use crate::{
     utils::{self, Mode},
 };
 
-/// The KCipher-2 stream cipher key.
+/// The [KCipher-2] stream cipher key.
+///
+/// [KCipher-2]: https://en.wikipedia.org/wiki/KCipher-2
 pub type Key = cipher::Key<KCipher2Core>;
 
-/// The KCipher-2 stream cipher initialization vector.
+/// The [KCipher-2] stream cipher initialization vector.
+///
+/// [KCipher-2]: https://en.wikipedia.org/wiki/KCipher-2
 pub type Iv = cipher::Iv<KCipher2Core>;
 
-/// The KCipher-2 stream cipher.
+/// The [KCipher-2] stream cipher.
+///
+/// [KCipher-2]: https://en.wikipedia.org/wiki/KCipher-2
 pub type KCipher2 = StreamCipherCoreWrapper<KCipher2Core>;
 
-/// Core state of the KCipher-2 stream cipher.
+/// Core state of the [KCipher-2] stream cipher.
+///
+/// [KCipher-2]: https://en.wikipedia.org/wiki/KCipher-2
 pub struct KCipher2Core {
     a: [u32; 5],
     b: [u32; 11],
