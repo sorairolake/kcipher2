@@ -4,7 +4,7 @@
 
 [package]
 name = "kcipher2"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 rust-version = "1.85.0"
 description = "An implementation of the KCipher-2 stream cipher"
