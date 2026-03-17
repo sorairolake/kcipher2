@@ -52,22 +52,15 @@ impl KCipher2Core {
     ///
     /// [RFC 7008 Section 2.3.1]: https://datatracker.ietf.org/doc/html/rfc7008#section-2.3.1
     fn next(&mut self, mode: &Mode) {
-        let mut next_a: [u32; 5] = Default::default();
-        let mut next_b: [u32; 11] = Default::default();
-
         let next_l1 = utils::sub_k2(self.r2.wrapping_add(self.b[4]));
         let next_r1 = utils::sub_k2(self.l2.wrapping_add(self.b[9]));
         let next_l2 = utils::sub_k2(self.l1);
         let next_r2 = utils::sub_k2(self.r1);
 
-        next_a[..4].copy_from_slice(&self.a[1..]);
-
-        next_b[..10].copy_from_slice(&self.b[1..]);
-
-        next_a[4] =
+        let mut feedback_a =
             (self.a[0] << 8) ^ consts::AMUL0[usize::try_from(self.a[0] >> 24).unwrap()] ^ self.a[3];
         if matches!(mode, Mode::Init) {
-            next_a[4] ^= utils::nlf(self.b[0], self.r2, self.r1, self.a[4]);
+            feedback_a ^= utils::nlf(self.b[0], self.r2, self.r1, self.a[4]);
         }
 
         let temp1 = if (self.a[2] & 0x4000_0000) != 0 {
@@ -82,15 +75,17 @@ impl KCipher2Core {
             self.b[8]
         };
 
-        next_b[10] = temp1 ^ self.b[1] ^ self.b[6] ^ temp2;
+        let mut feedback_b = temp1 ^ self.b[1] ^ self.b[6] ^ temp2;
 
         if matches!(mode, Mode::Init) {
-            next_b[10] ^= utils::nlf(self.b[10], self.l2, self.l1, self.a[0]);
+            feedback_b ^= utils::nlf(self.b[10], self.l2, self.l1, self.a[0]);
         }
 
-        self.a.copy_from_slice(&next_a);
+        self.a.rotate_left(1);
+        self.a[4] = feedback_a;
 
-        self.b.copy_from_slice(&next_b);
+        self.b.rotate_left(1);
+        self.b[10] = feedback_b;
 
         self.l1 = next_l1;
         self.r1 = next_r1;
@@ -114,13 +109,13 @@ impl KCipher2Core {
 
             ik[..4].copy_from_slice(&key_u32);
 
-            ik[4] = ik[0] ^ utils::sub_k2((ik[3] << 8) ^ (ik[3] >> 24)) ^ 0x0100_0000;
+            ik[4] = ik[0] ^ utils::sub_k2(ik[3].rotate_left(8)) ^ 0x0100_0000;
 
             ik[5] = ik[1] ^ ik[4];
             ik[6] = ik[2] ^ ik[5];
             ik[7] = ik[3] ^ ik[6];
 
-            ik[8] = ik[4] ^ utils::sub_k2((ik[7] << 8) ^ (ik[7] >> 24)) ^ 0x0200_0000;
+            ik[8] = ik[4] ^ utils::sub_k2(ik[7].rotate_left(8)) ^ 0x0200_0000;
 
             ik[9] = ik[5] ^ ik[8];
             ik[10] = ik[6] ^ ik[9];
@@ -131,25 +126,16 @@ impl KCipher2Core {
 
         let (ik, iv) = key_expansion(key, iv);
 
-        let mut a: [u32; 5] = Default::default();
-        for (&ik, a) in ik[..5].iter().rev().zip(a.iter_mut()) {
-            *a = ik;
-        }
+        let a = [ik[4], ik[3], ik[2], ik[1], ik[0]];
 
-        let mut b: [u32; 11] = Default::default();
-        b[0] = ik[10];
-        b[1] = ik[11];
-        b[2] = iv[0];
-        b[3] = iv[1];
-        b[4] = ik[8];
-        b[5] = ik[9];
-        b[6] = iv[2];
-        b[7] = iv[3];
-        b[8] = ik[7];
-        b[9] = ik[5];
-        b[10] = ik[6];
+        let b = [
+            ik[10], ik[11], iv[0], iv[1], ik[8], ik[9], iv[2], iv[3], ik[7], ik[5], ik[6],
+        ];
 
-        let (l1, r1, l2, r2) = Default::default();
+        let l1 = u32::default();
+        let r1 = u32::default();
+        let l2 = u32::default();
+        let r2 = u32::default();
 
         Self {
             a,
