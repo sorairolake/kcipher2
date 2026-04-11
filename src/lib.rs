@@ -50,7 +50,7 @@
 //! [KCipher-2]: https://en.wikipedia.org/wiki/KCipher-2
 //! [RFC 7008]: https://datatracker.ietf.org/doc/html/rfc7008
 
-#![doc(html_root_url = "https://docs.rs/kcipher2/0.1.2/")]
+#![doc(html_root_url = "https://docs.rs/kcipher2/0.1.3/")]
 #![no_std]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 // Lint levels of rustc.
