@@ -63,7 +63,7 @@ fn rfc7008() {
             for chunk in buf.chunks_mut(n) {
                 cipher.apply_keystream(chunk);
             }
-            assert!(buf.into_iter().all(|v| v == 0));
+            assert_eq!(buf, [0; 64]);
         }
     }
 }
