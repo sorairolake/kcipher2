@@ -6,6 +6,8 @@
 //!
 //! [KCipher-2]: https://en.wikipedia.org/wiki/KCipher-2
 
+use core::array;
+
 #[cfg(feature = "zeroize")]
 use cipher::zeroize::{Zeroize, ZeroizeOnDrop};
 use cipher::{
@@ -95,19 +97,25 @@ impl KCipher2Core {
 
     fn setup_state_values(key: &Key, iv: &Iv) -> Self {
         fn key_expansion(key: &Key, iv: &Iv) -> ([u32; 12], [u32; 4]) {
-            let mut key_u32: [u32; 4] = Default::default();
-            for (key, key_u32) in key.chunks_exact(4).zip(key_u32.iter_mut()) {
-                *key_u32 = u32::from_be_bytes(key.try_into().unwrap());
-            }
+            // TODO: Use `Iterator::next_chunk()` when stable.
+            let key: [u32; 4] = {
+                let mut iter = key
+                    .chunks_exact(4)
+                    .map(|c| u32::from_be_bytes(c.try_into().unwrap()));
+                array::from_fn(|_| iter.next().unwrap())
+            };
 
-            let mut iv_u32: [u32; 4] = Default::default();
-            for (iv, iv_u32) in iv.chunks_exact(4).zip(iv_u32.iter_mut()) {
-                *iv_u32 = u32::from_be_bytes(iv.try_into().unwrap());
-            }
+            // TODO: Use `Iterator::next_chunk()` when stable.
+            let iv: [u32; 4] = {
+                let mut iter = iv
+                    .chunks_exact(4)
+                    .map(|c| u32::from_be_bytes(c.try_into().unwrap()));
+                array::from_fn(|_| iter.next().unwrap())
+            };
 
             let mut ik: [u32; 12] = Default::default();
 
-            ik[..4].copy_from_slice(&key_u32);
+            ik[..4].copy_from_slice(&key);
 
             ik[4] = ik[0] ^ utils::sub_k2(ik[3].rotate_left(8)) ^ 0x0100_0000;
 
@@ -121,7 +129,7 @@ impl KCipher2Core {
             ik[10] = ik[6] ^ ik[9];
             ik[11] = ik[7] ^ ik[10];
 
-            (ik, iv_u32)
+            (ik, iv)
         }
 
         let (ik, iv) = key_expansion(key, iv);
