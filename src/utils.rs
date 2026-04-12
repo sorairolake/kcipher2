@@ -9,6 +9,7 @@
 use crate::consts;
 
 /// The operation mode.
+#[derive(Clone, Copy)]
 pub enum Mode {
     /// The operation is used for initialization.
     Init,

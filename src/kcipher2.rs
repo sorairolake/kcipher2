@@ -53,7 +53,7 @@ impl KCipher2Core {
     /// The `next()` operation as defined in [RFC 7008 Section 2.3.1].
     ///
     /// [RFC 7008 Section 2.3.1]: https://datatracker.ietf.org/doc/html/rfc7008#section-2.3.1
-    fn next(&mut self, mode: &Mode) {
+    fn next(&mut self, mode: Mode) {
         let next_l1 = utils::sub_k2(self.r2.wrapping_add(self.b[4]));
         let next_r1 = utils::sub_k2(self.l2.wrapping_add(self.b[9]));
         let next_l2 = utils::sub_k2(self.l1);
@@ -182,7 +182,7 @@ impl KeyIvInit for KCipher2Core {
         let mut state = Self::setup_state_values(key, iv);
 
         for _ in 0..24 {
-            state.next(&Mode::Init);
+            state.next(Mode::Init);
         }
         state
     }
@@ -226,7 +226,7 @@ impl ParBlocksSizeUser for Backend<'_> {
 impl StreamCipherBackend for Backend<'_> {
     fn gen_ks_block(&mut self, block: &mut Block<Self>) {
         let x = self.0.stream();
-        self.0.next(&Mode::Normal);
+        self.0.next(Mode::Normal);
         block.copy_from_slice(&x.to_be_bytes());
     }
 }
