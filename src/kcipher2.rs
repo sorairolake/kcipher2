@@ -100,19 +100,19 @@ impl KCipher2Core {
             // TODO: use `Iterator::next_chunk()` when stable.
             // <https://github.com/rust-lang/rust/issues/98326>
             let key: [u32; 4] = {
-                let mut iter = key
-                    .chunks_exact(4)
-                    .map(|c| u32::from_be_bytes(c.try_into().unwrap()));
-                array::from_fn(|_| iter.next().unwrap())
+                let (chunks, []) = slice.as_chunks::<4>() else {
+                    unreachable!()
+                };
+                array::from_fn(|i| u32::from_be_bytes(chunks[i]))
             };
 
             // TODO: use `Iterator::next_chunk()` when stable.
             // <https://github.com/rust-lang/rust/issues/98326>
             let iv: [u32; 4] = {
-                let mut iter = iv
-                    .chunks_exact(4)
-                    .map(|c| u32::from_be_bytes(c.try_into().unwrap()));
-                array::from_fn(|_| iter.next().unwrap())
+                let (chunks, []) = slice.as_chunks::<4>() else {
+                    unreachable!()
+                };
+                array::from_fn(|i| u32::from_be_bytes(chunks[i]))
             };
 
             let mut ik: [u32; 12] = Default::default();
