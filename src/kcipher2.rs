@@ -97,8 +97,6 @@ impl KCipher2Core {
 
     fn setup_state_values(key: &Key, iv: &Iv) -> Self {
         fn key_expansion(key: &Key, iv: &Iv) -> ([u32; 12], [u32; 4]) {
-            // TODO: use `Iterator::next_chunk()` when stable.
-            // <https://github.com/rust-lang/rust/issues/98326>
             let key: [u32; 4] = {
                 let (chunks, []) = slice.as_chunks::<4>() else {
                     unreachable!()
@@ -106,8 +104,6 @@ impl KCipher2Core {
                 array::from_fn(|i| u32::from_be_bytes(chunks[i]))
             };
 
-            // TODO: use `Iterator::next_chunk()` when stable.
-            // <https://github.com/rust-lang/rust/issues/98326>
             let iv: [u32; 4] = {
                 let (chunks, []) = slice.as_chunks::<4>() else {
                     unreachable!()
