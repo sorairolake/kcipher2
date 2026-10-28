@@ -99,14 +99,14 @@ impl KCipher2Core {
         fn key_expansion(key: &Key, iv: &Iv) -> ([u32; 12], [u32; 4]) {
             let key: [u32; 4] = {
                 let (chunks, []) = key.as_chunks::<4>() else {
-                    unreachable!()
+                    unreachable!();
                 };
                 array::from_fn(|i| u32::from_be_bytes(chunks[i]))
             };
 
             let iv: [u32; 4] = {
                 let (chunks, []) = iv.as_chunks::<4>() else {
-                    unreachable!()
+                    unreachable!();
                 };
                 array::from_fn(|i| u32::from_be_bytes(chunks[i]))
             };
