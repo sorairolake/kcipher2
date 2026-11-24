@@ -18,15 +18,15 @@ include = ["/LICENSES", "/README.md", "/src"]
 [package.metadata.docs.rs]
 all-features = true
 
+[features]
+zeroize = ["cipher/zeroize"]
+
 [dependencies]
 cipher = { version = "0.5.1", features = ["stream-wrapper"] }
 
 [dev-dependencies]
 cipher = { version = "0.5.1", features = ["dev"] }
 hex-literal = "1.1.0"
-
-[features]
-zeroize = ["cipher/zeroize"]
 
 [lints.clippy]
 cargo = { level = "warn", priority = -1 }
